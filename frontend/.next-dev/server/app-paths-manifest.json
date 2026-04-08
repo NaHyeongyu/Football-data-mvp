@@ -1,0 +1,7 @@
+{
+  "/players/[playerId]/page": "app/players/[playerId]/page.js",
+  "/assistant/page": "app/assistant/page.js",
+  "/training/[trainingId]/page": "app/training/[trainingId]/page.js",
+  "/calendar/page": "app/calendar/page.js",
+  "/physical/page": "app/physical/page.js"
+}
