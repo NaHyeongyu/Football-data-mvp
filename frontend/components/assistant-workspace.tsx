@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type {
   AssistantQueryResponse,
   AssistantQueryStep,
+  AssistantStatusResponse,
 } from "@/lib/team-api-types";
 
 type MessageRole = "assistant" | "system" | "user";
@@ -21,8 +22,15 @@ const INITIAL_MESSAGE: ChatMessage = {
   id: "assistant-welcome",
   role: "assistant",
   content:
-    "무엇을 도와드릴까요?\n경기, 훈련, 부상, 평가, 상담 데이터를 자연어 한 번으로 묶어서 조회할 수 있습니다.\n각 질문은 독립적으로 실행되며, DB 조회 결과와 모델 응답을 함께 정리합니다.",
+    "질문을 입력하면 정형 DB 조회와 pgvector RAG 검색을 함께 실행합니다. 선수, 경기, 훈련, 부상, 평가, 상담 데이터를 함께 물어볼 수 있습니다.",
 };
+
+const SAMPLE_QUESTIONS = [
+  "최근 2주 훈련 부하가 높은 선수 알려줘",
+  "부상 위험도 높은 선수와 이유 알려줘",
+  "최근 경기 폼 좋은 선수 추천해줘",
+  "오재민 최근 평가랑 상담 내용 종합해줘",
+];
 
 function createId() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -58,26 +66,6 @@ function getPreviewKeys(step: AssistantQueryStep) {
   return firstRow ? Object.keys(firstRow).slice(0, 6) : [];
 }
 
-function messageLabel(role: MessageRole) {
-  if (role === "user") {
-    return "You";
-  }
-  if (role === "system") {
-    return "System";
-  }
-  return "Assistant";
-}
-
-function messageAvatar(role: MessageRole) {
-  if (role === "user") {
-    return "U";
-  }
-  if (role === "system") {
-    return "!";
-  }
-  return "A";
-}
-
 function MessageTrace({ response }: { response: AssistantQueryResponse }) {
   return (
     <details className="assistant-trace">
@@ -85,7 +73,7 @@ function MessageTrace({ response }: { response: AssistantQueryResponse }) {
         <div>
           <strong>실행 로그</strong>
           <span>
-            {response.provider} · {response.model} · Step {response.steps.length}
+            {response.provider} · {response.model} · {response.steps.length} steps
           </span>
         </div>
         <span className="assistant-trace__toggle">열기</span>
@@ -96,25 +84,16 @@ function MessageTrace({ response }: { response: AssistantQueryResponse }) {
           const previewKeys = getPreviewKeys(step);
 
           return (
-            <article className="assistant-step-card" key={`${step.step}-${step.action}`}>
+            <article className="assistant-step-card" key={`${step.step}-${step.action}-${step.tool ?? "none"}`}>
               <div className="assistant-step-card__head">
                 <strong>
-                  Step {step.step} · {step.action.toUpperCase()}
+                  Step {step.step} · {step.tool ?? step.action}
                 </strong>
                 {step.row_count !== null ? <span>{step.row_count} rows</span> : null}
               </div>
 
-              {step.reason ? (
-                <p className="assistant-step-card__reason">{step.reason}</p>
-              ) : null}
-
-              {step.error ? (
-                <p className="assistant-step-card__error">{step.error}</p>
-              ) : null}
-
-              {step.sql ? (
-                <pre className="assistant-code-block">{step.sql}</pre>
-              ) : null}
+              {step.reason ? <p>{step.reason}</p> : null}
+              {step.error ? <p className="assistant-step-card__error">{step.error}</p> : null}
 
               {previewKeys.length > 0 ? (
                 <div className="assistant-preview-wrap">
@@ -146,17 +125,56 @@ function MessageTrace({ response }: { response: AssistantQueryResponse }) {
   );
 }
 
+function StatusBar({ status }: { status: AssistantStatusResponse | null }) {
+  if (!status) {
+    return (
+      <div className="assistant-status">
+        <span>Assistant status</span>
+        <strong>확인 중</strong>
+      </div>
+    );
+  }
+
+  return (
+    <div className="assistant-status">
+      <span>
+        {status.chat_provider} · {status.chat_model}
+      </span>
+      <strong>
+        pgvector {status.pgvector_available ? "ready" : "unavailable"} · {status.indexed_chunks} chunks
+      </strong>
+    </div>
+  );
+}
+
 export function AssistantWorkspace() {
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [draft, setDraft] = useState("");
   const [requestError, setRequestError] = useState<string | null>(null);
+  const [status, setStatus] = useState<AssistantStatusResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [isSubmitting, messages]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadStatus() {
+      const response = await fetch("/api/assistant/status", { cache: "no-store" });
+      const payload = (await response.json().catch(() => null)) as AssistantStatusResponse | null;
+      if (!ignore && response.ok && payload) {
+        setStatus(payload);
+      }
+    }
+
+    void loadStatus();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   async function submitQuestion(question: string) {
     const normalizedQuestion = question.trim();
@@ -164,14 +182,12 @@ export function AssistantWorkspace() {
       return;
     }
 
-    const userMessageId = createId();
-
     setRequestError(null);
     setIsSubmitting(true);
     setMessages((current) => [
       ...current,
       {
-        id: userMessageId,
+        id: createId(),
         role: "user",
         content: normalizedQuestion,
       },
@@ -192,10 +208,7 @@ export function AssistantWorkspace() {
 
       if (!response.ok) {
         throw new Error(
-          extractErrorMessage(
-            payload,
-            `Assistant query failed (${response.status})`,
-          ),
+          extractErrorMessage(payload, `Assistant query failed (${response.status})`),
         );
       }
 
@@ -211,10 +224,7 @@ export function AssistantWorkspace() {
       ]);
     } catch (error) {
       const message =
-        error instanceof Error
-          ? error.message
-          : "질의 처리 중 오류가 발생했습니다.";
-
+        error instanceof Error ? error.message : "질의 처리 중 오류가 발생했습니다.";
       setRequestError(message);
       setMessages((current) => [
         ...current,
@@ -231,12 +241,10 @@ export function AssistantWorkspace() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const nextQuestion = draft;
     if (!nextQuestion.trim() || isSubmitting) {
       return;
     }
-
     setDraft("");
     void submitQuestion(nextQuestion);
   }
@@ -257,106 +265,85 @@ export function AssistantWorkspace() {
   }
 
   return (
-    <section className="assistant-shell">
-      <section className="assistant-stage">
+    <main className="page assistant-page">
+      <header className="assistant-page__header">
+        <div>
+          <span className="eyebrow">Assistant</span>
+          <h1>데이터 질의 에이전트</h1>
+        </div>
+        <StatusBar status={status} />
+      </header>
+
+      <section className="assistant-shell">
         <div className="assistant-thread">
-          <div className="assistant-message-stack">
-            {messages.map((message) => (
-              <div
-                className={
-                  message.role === "user"
-                    ? "assistant-bubble-row assistant-bubble-row--user"
-                    : "assistant-bubble-row"
-                }
-                id={message.id}
-                key={message.id}
-              >
-                {message.role !== "user" ? (
-                  <span className={`assistant-bubble__avatar assistant-bubble__avatar--${message.role}`}>
-                    {messageAvatar(message.role)}
-                  </span>
-                ) : null}
-
-                <article
-                  className={`assistant-bubble assistant-bubble--${message.role}`}
-                >
-                  <div className="assistant-bubble__meta">
-                    <strong>{messageLabel(message.role)}</strong>
-                    {message.response ? (
-                      <span>
-                        {message.response.provider} · {message.response.model}
-                      </span>
-                    ) : null}
-                  </div>
-
-                  <div className="assistant-bubble__body">{message.content}</div>
-
-                  {message.response ? <MessageTrace response={message.response} /> : null}
-                </article>
-
-                {message.role === "user" ? (
-                  <span className="assistant-bubble__avatar assistant-bubble__avatar--user">
-                    {messageAvatar(message.role)}
+          {messages.map((message) => (
+            <article
+              className={
+                message.role === "user"
+                  ? "assistant-message assistant-message--user"
+                  : `assistant-message assistant-message--${message.role}`
+              }
+              key={message.id}
+            >
+              <div className="assistant-message__meta">
+                <strong>{message.role === "user" ? "You" : message.role === "system" ? "System" : "Assistant"}</strong>
+                {message.response ? (
+                  <span>
+                    {message.response.citations.length} citations · {message.response.steps.length} steps
                   </span>
                 ) : null}
               </div>
-            ))}
+              <p>{message.content}</p>
+              {message.response ? <MessageTrace response={message.response} /> : null}
+            </article>
+          ))}
 
-            {isSubmitting ? (
-              <div className="assistant-bubble-row">
-                <span className="assistant-bubble__avatar assistant-bubble__avatar--assistant">
-                  A
-                </span>
-                <article className="assistant-bubble assistant-bubble--assistant assistant-bubble--pending">
-                  <div className="assistant-bubble__meta">
-                    <strong>Assistant</strong>
-                    <span>질의 실행 중</span>
-                  </div>
-                  <div className="assistant-bubble__body">
-                    데이터 조회와 응답 생성을 진행하고 있습니다.
-                  </div>
-                </article>
+          {isSubmitting ? (
+            <article className="assistant-message assistant-message--assistant">
+              <div className="assistant-message__meta">
+                <strong>Assistant</strong>
+                <span>질의 실행 중</span>
               </div>
-            ) : null}
-
-            <div ref={messagesEndRef} />
-          </div>
+              <p>DB 도구와 pgvector RAG 검색을 실행하고 있습니다.</p>
+            </article>
+          ) : null}
+          <div ref={messagesEndRef} />
         </div>
 
-        <form className="assistant-service-composer" onSubmit={handleSubmit}>
-          <div className="assistant-service-composer__surface">
-            <label className="assistant-service-composer__field">
-              <textarea
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={handleTextareaKeyDown}
-                placeholder="예: 최근 2주간 활동량이 높았지만 부상 위험도도 높은 선수 알려줘."
-                ref={textareaRef}
-                rows={4}
-                value={draft}
-              />
-            </label>
-
-            <div className="assistant-service-composer__footer">
-              <div className="assistant-service-composer__meta">
-                <span>`Enter` 전송</span>
-                <span>`Shift + Enter` 줄바꿈</span>
-              </div>
-
+        <form className="assistant-composer" onSubmit={handleSubmit}>
+          <div className="assistant-samples" aria-label="Sample questions">
+            {SAMPLE_QUESTIONS.map((question) => (
               <button
-                className="primary-button assistant-service-composer__submit"
-                disabled={!draft.trim() || isSubmitting}
-                type="submit"
+                disabled={isSubmitting}
+                key={question}
+                onClick={() => setDraft(question)}
+                type="button"
               >
-                {isSubmitting ? "질의 중..." : "보내기"}
+                {question}
               </button>
-            </div>
+            ))}
           </div>
 
-          {requestError ? (
-            <p className="assistant-service-composer__error">{requestError}</p>
-          ) : null}
+          <label className="assistant-composer__field">
+            <textarea
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={handleTextareaKeyDown}
+              placeholder="예: 최근 2주간 활동량이 높지만 부상 위험도도 높은 선수 알려줘."
+              rows={4}
+              value={draft}
+            />
+          </label>
+
+          <div className="assistant-composer__footer">
+            <span>Enter 전송 · Shift+Enter 줄바꿈</span>
+            <button disabled={!draft.trim() || isSubmitting} type="submit">
+              {isSubmitting ? "질의 중" : "보내기"}
+            </button>
+          </div>
+
+          {requestError ? <p className="assistant-composer__error">{requestError}</p> : null}
         </form>
       </section>
-    </section>
+    </main>
   );
 }

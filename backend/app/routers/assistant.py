@@ -16,4 +16,4 @@ def get_status() -> AssistantStatusResponse:
 
 @router.post("/query", response_model=AssistantQueryResponse)
 def query_assistant(payload: AssistantQueryRequest) -> AssistantQueryResponse:
-    return run_assistant_query(question=payload.question)
+    return run_assistant_query(payload.question)

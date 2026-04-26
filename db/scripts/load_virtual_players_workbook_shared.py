@@ -377,6 +377,7 @@ INIT_SQL_FILES = (
     DB_DIR / "init" / "003_gps_column_naming.sql",
     DB_DIR / "init" / "002_views.sql",
     DB_DIR / "init" / "004_evaluation_trend.sql",
+    DB_DIR / "init" / "005_assistant_rag.sql",
 )
 
 COUNT_QUERIES = {

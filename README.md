@@ -30,6 +30,7 @@ npm run dev
 - `/matches`: 경기 로그
 - `/physical`: 피지컬 / GPS
 - `/injury`: 메디컬 / AT
+- `/assistant`: DB + pgvector RAG 질의 에이전트
 - `/reports`: 리포트
 
 ## 현재 데이터 구조
@@ -57,6 +58,27 @@ cd ..
 ```
 
 상세 설명은 `db/README.md`를 보면 됩니다.
+
+## Assistant RAG 인덱싱
+
+기본값은 Ollama 기반입니다.
+
+```bash
+ollama pull llama3.1:8b
+ollama pull nomic-embed-text
+./.venv/bin/python db/scripts/index_assistant_rag.py
+```
+
+OpenAI를 쓰려면 환경변수를 바꿉니다.
+
+```bash
+ASSISTANT_PROVIDER=openai \
+ASSISTANT_MODEL=gpt-4o-mini \
+ASSISTANT_EMBEDDING_PROVIDER=openai \
+ASSISTANT_EMBEDDING_MODEL=text-embedding-3-small \
+OPENAI_API_KEY=... \
+./.venv/bin/python db/scripts/index_assistant_rag.py
+```
 
 ## API 실행
 

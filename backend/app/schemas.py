@@ -674,12 +674,13 @@ class TeamMatchDetailResponse(BaseModel):
 
 
 class AssistantStatusResponse(BaseModel):
-    provider: str
-    base_url: str
-    model: str
-    reachable: bool
-    model_available: bool
-    available_models: list[str]
+    chat_provider: str
+    chat_model: str
+    embedding_provider: str
+    embedding_model: str
+    pgvector_available: bool
+    indexed_documents: int
+    indexed_chunks: int
     detail: str
 
 
@@ -690,11 +691,19 @@ class AssistantQueryRequest(BaseModel):
 class AssistantQueryStep(BaseModel):
     step: int
     action: str
+    tool: str | None = None
     reason: str | None = None
-    sql: str | None = None
     row_count: int | None = None
-    error: str | None = None
     preview: list[dict[str, object | None]] = Field(default_factory=list)
+    error: str | None = None
+
+
+class AssistantCitation(BaseModel):
+    title: str
+    source_type: str
+    source_uri: str
+    chunk_id: str | None = None
+    similarity: float | None = None
 
 
 class AssistantQueryResponse(BaseModel):
@@ -703,3 +712,4 @@ class AssistantQueryResponse(BaseModel):
     model: str
     answer: str
     steps: list[AssistantQueryStep]
+    citations: list[AssistantCitation] = Field(default_factory=list)

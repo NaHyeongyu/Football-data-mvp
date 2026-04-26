@@ -427,12 +427,13 @@ export type TeamMatchDetailResponse = {
 };
 
 export type AssistantStatusResponse = {
-  provider: string;
-  base_url: string;
-  model: string;
-  reachable: boolean;
-  model_available: boolean;
-  available_models: string[];
+  chat_provider: string;
+  chat_model: string;
+  embedding_provider: string;
+  embedding_model: string;
+  pgvector_available: boolean;
+  indexed_documents: number;
+  indexed_chunks: number;
   detail: string;
 };
 
@@ -443,11 +444,19 @@ export type AssistantQueryRequest = {
 export type AssistantQueryStep = {
   step: number;
   action: string;
+  tool: string | null;
   reason: string | null;
-  sql: string | null;
   row_count: number | null;
-  error: string | null;
   preview: Array<Record<string, unknown>>;
+  error: string | null;
+};
+
+export type AssistantCitation = {
+  title: string;
+  source_type: string;
+  source_uri: string;
+  chunk_id: string | null;
+  similarity: number | null;
 };
 
 export type AssistantQueryResponse = {
@@ -456,6 +465,7 @@ export type AssistantQueryResponse = {
   model: string;
   answer: string;
   steps: AssistantQueryStep[];
+  citations: AssistantCitation[];
 };
 
 export type PlayerRecentInjuryHistoryItem = {

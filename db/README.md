@@ -4,7 +4,7 @@
 
 ## 구성
 
-- `docker-compose.yml`: Postgres 실행
+- `docker-compose.yml`: pgvector 확장이 포함된 Postgres 실행
 - `init/001_schema.sql`: enum, lookup, fact 테이블
 - `init/002_views.sql`: 자주 쓸 뷰
 - `ERD.md`: Mermaid ERD
@@ -32,6 +32,8 @@
   - `training_gps_stats`
   - `evaluations`
   - `counseling_notes`
+  - `assistant_documents`
+  - `assistant_chunks`
 
 ## 실행
 
@@ -40,6 +42,12 @@ cd db
 docker compose up -d
 cd ..
 ./.venv/bin/python db/scripts/load_virtual_players_workbook.py
+```
+
+RAG 인덱스는 워크북 적재 후 별도로 생성합니다.
+
+```bash
+./.venv/bin/python db/scripts/index_assistant_rag.py
 ```
 
 기본 접속 정보:
