@@ -12,7 +12,7 @@ export function ColorGuide() {
           <p className="eyebrow">Design Guide</p>
           <h2 id="color-guide-title">축구팀 내부 데이터 시스템용 컬러 가이드</h2>
           <p className="description">
-            딥그린을 중심으로 중립색과 상태색을 제한적으로 조합해 신뢰감 있는
+            네이비 블루와 화이트를 중심으로 중립색과 상태색을 제한적으로 조합해 신뢰감 있는
             분석 화면을 구성합니다.
           </p>
         </div>
@@ -56,7 +56,7 @@ export function ColorGuide() {
               <h3>버튼 적용 예시</h3>
             </div>
             <p className="panel-note">
-              CTA는 딥그린, 보조 액션은 화이트 기반으로 유지
+              CTA는 네이비 블루, 보조 액션은 화이트 기반으로 유지
             </p>
           </div>
 

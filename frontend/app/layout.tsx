@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import { SiteNav } from "@/components/site-nav";
 
 export const metadata: Metadata = {
-  title: "전북현대 유소년 데이터 관리 시스템",
-  description: "전북현대 유소년팀 내부 데이터 관리 시스템 프론트엔드",
+  title: "Football Data System",
+  description: "Football Data System 프론트엔드",
 };
 
 type RootLayoutProps = {

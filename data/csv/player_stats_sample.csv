@@ -1,8 +1,8 @@
 match_id,player_name,team_name,minutes_played,goals,assists,passes_completed,xg
 1,Stanislav Iljutcenko,FC Seoul,90,1,0,21,0.84
 1,Jung Seung-hyun,Ulsan HD,90,0,0,48,0.03
-2,Lee Dong-jun,Jeonbuk Hyundai,88,1,0,34,0.59
+2,Lee Dong-jun,Football Data System,88,1,0,34,0.59
 2,Kim In-sung,Pohang Steelers,90,1,0,29,0.44
 3,Martin Adam,Ulsan HD,75,2,0,17,1.21
-3,Song Min-kyu,Jeonbuk Hyundai,90,0,0,26,0.12
+3,Song Min-kyu,Football Data System,90,0,0,26,0.12
 

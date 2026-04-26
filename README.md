@@ -1,6 +1,6 @@
 # Football Data System
 
-전북현대 유소년 데이터 관리 시스템 작업용 저장소입니다.
+Football Data System 작업용 저장소입니다.
 
 현재는 `frontend` 단독 실행이 가능하고, 별도로 `virtual_players_2008_complete_with_all_staff_data.xlsx`를 PostgreSQL로 적재하는 `db` 구성도 포함합니다.
 

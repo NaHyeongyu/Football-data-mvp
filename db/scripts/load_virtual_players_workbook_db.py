@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from collections.abc import Iterable, Iterator, Sequence
+from numbers import Integral, Real
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,12 @@ def _py_value(value: Any) -> Any:
         return value.to_pydatetime()
     if pd.isna(value):
         return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, Integral):
+        return int(value)
+    if isinstance(value, Real) and float(value).is_integer():
+        return int(value)
     return value
 
 

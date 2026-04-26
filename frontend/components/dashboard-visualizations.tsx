@@ -42,14 +42,14 @@ function formatSigned(value: number, digits = 1) {
 
 const dashboardToneStyles = {
   brand: {
-    areaTop: "#1e4330",
-    areaBottom: "#afc3b5",
-    stroke: "#1a3929",
+    areaTop: "#1d4ed8",
+    areaBottom: "#93c5fd",
+    stroke: "#0b2545",
   },
   success: {
-    areaTop: "#2e7d4f",
-    areaBottom: "#afc3b5",
-    stroke: "#2e7d4f",
+    areaTop: "#2563eb",
+    areaBottom: "#93c5fd",
+    stroke: "#2563eb",
   },
   danger: {
     areaTop: "#c94c4c",
@@ -136,13 +136,13 @@ export function SeasonPerformanceVisual({
           <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <defs>
               <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#1e4330" stopOpacity={0.24} />
-                <stop offset="70%" stopColor="#4e7a67" stopOpacity={0.08} />
-                <stop offset="100%" stopColor="#afc3b5" stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#1d4ed8" stopOpacity={0.24} />
+                <stop offset="70%" stopColor="#3b82f6" stopOpacity={0.08} />
+                <stop offset="100%" stopColor="#93c5fd" stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid
-              stroke="rgba(26, 57, 41, 0.08)"
+              stroke="rgba(11, 37, 69, 0.08)"
               strokeDasharray="3 6"
               vertical={false}
             />
@@ -150,7 +150,7 @@ export function SeasonPerformanceVisual({
               axisLine={false}
               dataKey="label"
               dy={8}
-              tick={{ fill: "#5f7467", fontSize: 11, fontWeight: 700 }}
+              tick={{ fill: "#5d718f", fontSize: 11, fontWeight: 700 }}
               tickLine={false}
             />
             <YAxis
@@ -183,21 +183,21 @@ export function SeasonPerformanceVisual({
                   </div>
                 );
               }}
-              cursor={{ stroke: "rgba(26, 57, 41, 0.16)", strokeDasharray: "4 4" }}
+              cursor={{ stroke: "rgba(11, 37, 69, 0.16)", strokeDasharray: "4 4" }}
             />
             <ReferenceLine
               ifOverflow="extendDomain"
-              stroke="rgba(26, 57, 41, 0.16)"
+              stroke="rgba(11, 37, 69, 0.16)"
               strokeDasharray="4 4"
               y={averagePoints}
             />
             <Area
-              activeDot={{ fill: "#ffffff", r: 5, stroke: "#1a3929", strokeWidth: 3 }}
+              activeDot={{ fill: "#ffffff", r: 5, stroke: "#0b2545", strokeWidth: 3 }}
               dataKey="value"
-              dot={chartData.length === 1 ? { fill: "#ffffff", r: 4, stroke: "#1a3929", strokeWidth: 2.5 } : false}
+              dot={chartData.length === 1 ? { fill: "#ffffff", r: 4, stroke: "#0b2545", strokeWidth: 2.5 } : false}
               fill={`url(#${gradientId})`}
               fillOpacity={1}
-              stroke="#1a3929"
+              stroke="#0b2545"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={3}
@@ -283,7 +283,7 @@ function MetricStrip({
               </linearGradient>
             </defs>
             <CartesianGrid
-              stroke="rgba(26, 57, 41, 0.08)"
+              stroke="rgba(11, 37, 69, 0.08)"
               strokeDasharray="3 6"
               vertical={false}
             />
@@ -312,7 +312,7 @@ function MetricStrip({
                   </div>
                 );
               }}
-              cursor={{ stroke: "rgba(26, 57, 41, 0.14)", strokeDasharray: "4 4" }}
+              cursor={{ stroke: "rgba(11, 37, 69, 0.14)", strokeDasharray: "4 4" }}
             />
             <Area
               activeDot={{ fill: "#ffffff", r: 4, stroke: toneStyle.stroke, strokeWidth: 2.5 }}

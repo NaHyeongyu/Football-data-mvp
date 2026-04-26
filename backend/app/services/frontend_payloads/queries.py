@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-TEAM_NAME = "전북현대 U18"
+TEAM_NAME = "Football Data System"
 FRONTEND_MIN_SEASON_YEAR = 2023
 FRONTEND_MAX_SEASON_YEAR = 2025
 

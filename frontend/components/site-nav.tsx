@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -26,17 +25,11 @@ export function SiteNav() {
       <div className="site-sidebar__inner">
         <Link className="brand" href="/calendar">
           <span className="brand__mark" aria-hidden="true">
-            <Image
-              alt=""
-              height={38}
-              priority
-              src="/jeonbuk.svg"
-              width={38}
-            />
+            <span className="brand__monogram">FDS</span>
           </span>
           <span className="brand__copy">
-            <span className="brand__meta">JEONBUK HYUNDAI</span>
-            <span className="brand__title">유소년 데이터 관리 시스템</span>
+            <span className="brand__meta">FOOTBALL DATA</span>
+            <span className="brand__title">System</span>
           </span>
         </Link>
 

@@ -788,7 +788,7 @@ export function MatchDetailWorkspace({ data }: { data: TeamMatchDetailResponse }
               <em>:</em>
               {data.match.goals_against}
             </strong>
-            <p>JEONBUK U18 vs {data.match.opponent_team}</p>
+            <p>Football Data System vs {data.match.opponent_team}</p>
           </div>
         </div>
 

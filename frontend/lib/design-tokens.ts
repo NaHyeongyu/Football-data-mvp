@@ -1,35 +1,36 @@
 export const brandColors = {
-  primary900: "#1A3929",
-  primary800: "#1E4330",
+  primary950: "#071A33",
+  primary900: "#0B2545",
+  primary800: "#123A6F",
   baseWhite: "#FFFFFF",
 } as const;
 
 export const neutralColors = {
-  background: "#F6F8F7",
+  background: "#F5F9FF",
   surface: "#FFFFFF",
-  border: "#D9E3DD",
-  textPrimary: "#14281D",
-  textSecondary: "#5F7467",
-  disabled: "#A9B8AF",
-  tableHeader: "#EEF3F0",
-  tableRowHover: "#F4F8F5",
-  placeholder: "#8B9A91",
+  border: "#D7E4F5",
+  textPrimary: "#10233F",
+  textSecondary: "#5D718F",
+  disabled: "#A9B8CC",
+  tableHeader: "#EEF5FF",
+  tableRowHover: "#F3F8FF",
+  placeholder: "#7F91AB",
 } as const;
 
 export const statusColors = {
-  success: "#2E7D4F",
+  success: "#2F8C5B",
   warning: "#D4A72C",
   danger: "#C94C4C",
-  info: "#4E7A67",
+  info: "#2563EB",
 } as const;
 
 export const chartColors = {
-  primaryDark: "#1A3929",
-  primaryMid: "#1E4330",
-  softGreen: "#4E7A67",
-  paleGreen: "#AFC3B5",
-  lightGrayGreen: "#DCE7E0",
-  positive: "#2E7D4F",
+  primaryDark: "#0B2545",
+  primaryMid: "#1D4ED8",
+  skyBlue: "#3B82F6",
+  paleBlue: "#93C5FD",
+  lightBlue: "#DBEAFE",
+  positive: "#2F8C5B",
   caution: "#D4A72C",
   risk: "#C94C4C",
 } as const;
@@ -52,7 +53,7 @@ export const semanticColors = {
 export const colorGuideSections = [
   {
     title: "Brand Core",
-    description: "브랜드 중심 컬러와 다크 UI 축",
+    description: "브랜드 중심 컬러와 네이비 UI 축",
     items: [
       {
         name: "Primary 900",
@@ -148,18 +149,18 @@ export const colorGuideSections = [
         usage: "평점, 퍼포먼스 추이",
       },
       {
-        name: "Soft Green",
-        value: chartColors.softGreen,
+        name: "Sky Blue",
+        value: chartColors.skyBlue,
         usage: "피지컬 변화, 보조 지표",
       },
       {
-        name: "Pale Green",
-        value: chartColors.paleGreen,
+        name: "Pale Blue",
+        value: chartColors.paleBlue,
         usage: "평균선, 비교 기준선",
       },
       {
-        name: "Light Gray Green",
-        value: chartColors.lightGrayGreen,
+        name: "Light Blue",
+        value: chartColors.lightBlue,
         usage: "영역 채움, 보조 배경",
       },
     ],
