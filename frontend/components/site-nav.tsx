@@ -10,6 +10,7 @@ const links = [
   { href: "/training", label: "Training", sublabel: "훈련" },
   { href: "/physical", label: "Physical", sublabel: "피지컬" },
   { href: "/injury", label: "Injury", sublabel: "부상" },
+  { href: "/reports", label: "Reports", sublabel: "보고서" },
   { href: "/assistant", label: "Assistant", sublabel: "질의" },
 ];
 
